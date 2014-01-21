@@ -1,17 +1,23 @@
 # Peanut Butter Jelly Time!
 
+### IMPORTS AND GLOBALS
 from sys import exit
 import os
+
+bread = 0
+peanut_butter = 0
+jelly = 0
 
 # Welcome Screen
 welcome1 = "LUNCH TIME!!!"
 
 # Can you make a peanut butter and jelly sandwich?
 def the_kitchen():
+    print "Okay, we're in the kitchen."
     start = raw_input("Are you hungry for some PB&J? (Y/N) ")
     if start[0].upper() == "Y":
         print "Awesome! Let's get started!"
-        bread()
+        ingredients()
     elif start[0].upper() == "N":
         print "More for me!"
         print "Bye!"
@@ -20,50 +26,35 @@ def the_kitchen():
         print "I'm not sure you answered the question..."
         the_kitchen()
 
-# Do you have enough bread?
-def bread():
-    global bread, bread_per_sandwich, leftover_bread
+### MAKING SANDWICHES ###
+
+# Do you have the materials for a PB&J?
+def ingredients():
+    global bread, peanut_butter, jelly
     bread = int(raw_input("How many pieces of bread can you find? "))
-    if bread <= 0:
-        print "Well, you can't get very far without bread..."
-        print "Guess we need to go shopping"
-        exit(0)
-        #shopping()
-    elif bread > 0:
-        bread_per_sandwich = bread / 2
-        leftover_bread = bread % 2
-        peanut_butter()
-    else:
-        print "I don't think you entered a number. Try again."
-        bread()
-
-# Do you have peanut butter and jelly?
-def peanut_butter():
-    global peanut_butter
     peanut_butter = int(raw_input("How many sandwiches worth of peanut butter do you have? "))
-    if peanut_butter <= 0:
-        print "NO PEANUT BUTTER!?"
-        print "Shopping time!"
-        exit(0)
-        #shopping()
-    else:
-        jelly()
-
-def jelly():
-    global jelly
     jelly = int(raw_input("How many sandwiches worth of jelly do you have? "))
-    if jelly <= 0:
-        print "What's PB&J without the J!?"
-        print "Time to go shopping"
-        exit(0)
-        #shopping()
+    if min(bread, peanut_butter, jelly) <= 0:
+        print "Uh oh, looks like you're missing some ingredients."
+        print "Shopping time!"
+        shopping()
+    elif min(bread, peanut_butter, jelly) > 0:
+        print "Ok, let's make some sandwiches!"
+        clear_screen()
+        sandwiches()
     else:
-        making_sandwiches()
+        print "Hmm, I think you may have mistyped something..."
+        print "Let's try again"
+        ingredients()
 
 # How many sandwiches can you make?
-def making_sandwiches():
-    global bread_per_sandwich, peanut_butter, jelly, sandwiches_possible, bread
-    sandwiches_possible = min(bread_per_sandwich, peanut_butter, jelly)
+def sandwiches():
+    global bread, peanut_butter, jelly
+    sandwiches_possible = min((bread / 2), peanut_butter, jelly)
+    openface_possible = min((bread % 2), peanut_butter, jelly)
+    
+    print "Let's see here..."
+    print "..."
     
     if sandwiches_possible > 1:
         print "You can make {0} sandwiches! Find friends and share!".format(sandwiches_possible)
@@ -77,16 +68,57 @@ def making_sandwiches():
         jelly -= sandwiches_possible
         bread -= (sandwiches_possible * 2)
         still_hungry()
+    elif sandwiches_possible == 0 and openface_possible > 0:
+        print "You can't make a full sandwich, but..."
+        openface()
+    elif bread >= 1 and peanut_butter >= 1:
+        print "You can't make a full PB&J, but..."
+        pb_only()
     else:
-        print "Hmm, it seems we have more shopping to do..."
-        exit(0)
-        #shopping()
+        print "Looks like we're short some ingredients. Shopping time!"
+        shopping()
+        
+# Can you make an open-face PB&J?
+def openface():
+    global bread, peanut_butter, jelly
+    print "Lucky for you, we can make an open-face PB&J!"
+    bread -= 1
+    peanut_butter -= 1
+    jelly -= 1
+    still_hungry()
+
+# Can you make an peanut butter sandwich?
+def pb_only():
+    global bread, peanut_butter
+    pb_possible = min((bread / 2), peanut_butter)
+    pb_open_possible = min((bread % 2), peanut_butter)
+    
+    if pb_possible > 0:
+        print "You could have {0} peanut butter-only sandwich(es)...".format(pb_possible)
+        choice = raw_input("Want one? (Y/N)")
+        if choice[0].upper() == "Y":
+            print "I mean, if you really insist..."
+            still_hungry()
+        elif choice[0].upper() == "N":
+            print "Good choice. Peanut butter only sandwiches aren't as good as PB&J."
+            print "Let's go shopping instead."
+            shopping()
+    elif pb_open_possible > 0:
+        print "You could have {0} peanut butter-only open-face sandwich...".format(pb_open_possible)
+        choice = raw_input("Want it? (Y/N)")
+        if choice[0].upper() == "Y":
+            print "Ugh, I suppose that's a lunch..."
+            still_hungry()
+        elif choice[0].upper() == "N":
+            print "Good choice. Peanut butter only sandwiches just aren't as good as PB&J."
+            print "Let's go shopping instead."
+            shopping()
 
 # Are you still hungry?
 def still_hungry():
     give_me_more = raw_input("Are you still hungry? (Y/N)" )
     if give_me_more[0].upper() == "Y":
-        open_face()
+        sandwiches()
     elif give_me_more[0].upper() == "N":
         print "Ok! Until next time!"
         exit(0)
@@ -94,22 +126,69 @@ def still_hungry():
         "I'm not sure you answered the question..."
         still_hungry()
 
-# Can you still make some open face sandwiches?
-def open_face():
-    global leftover_bread, peanut_butter, jelly, bread
-    openface_possible = min(leftover_bread, peanut_butter, jelly)
-    if openface_possible > 0:
-        print "Okay! Lucky for you, there's still enough for an openface PB&J!"
-        leftover_bread -= openface_possible
-        peanut_butter -= openface_possible
-        jelly -= openface_possible
-        bread -= openface_possible
-        still_hungry()
-    else:
-        print "Grocery store time then!"
-        exit(0)
-        #shopping()
+### SHOPPING ###
+
+# Shopping Time!
+def shopping():
+    clear_screen()
+    print "Welcome to the grocery store!"
+    what_to_buy()
+
+def what_to_buy():
+    global bread, peanut_butter, jelly
+    if min(bread, peanut_butter, jelly) <= 0:
     
+        # Do you need bread?
+        if bread < 1:
+            print "You need to buy some bread."
+        elif bread < 2:
+            print "If you want more than just an open-face sandwich, you should buy bread."
+        else:
+            print "We're good on bread."
+
+        # Do you need peanut butter?
+        if peanut_butter < 1:
+            print "You need to buy some peanut butter."
+        else:
+            print "We're good on peanut butter."
+    
+        # Do you need jelly?
+        if jelly < 1:
+            print "You need to buy some jelly."
+        else:
+            print "We're good on jelly."
+    
+        # What do you want to buy?
+        buying()
+    
+    else:
+        print "I think you bought enough. Let's go back to the kitchen."
+        sandwiches()
+    
+def buying():
+    global bread, peanut_butter, jelly
+    choice = raw_input("What should we pick up first? (Bread/Peanut Butter/Jelly) ")
+    if choice[0].upper() == "B":
+        new_bread = int(raw_input("How many slices should we buy?"))
+        bread += new_bread
+        clear_screen()
+        print "Great, you bought some bread."
+        what_to_buy()
+    elif choice[0].upper() == "P":
+        new_pb = int(raw_input("How much peanut butter should we buy?"))
+        peanut_butter += new_pb
+        clear_screen()
+        print "Great, you bought some peanut butter."
+        what_to_buy()
+    elif choice[0].upper() == "J":
+        new_jelly = int(raw_input("How much jelly should we buy?"))
+        jelly += new_jelly
+        clear_screen()
+        print "Greay, you bought some jelly."
+        what_to_buy()
+    
+### SETUP ###
+
 #Clear Screen
 def clear_screen():
     if clear:
