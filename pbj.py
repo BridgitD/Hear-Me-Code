@@ -98,6 +98,8 @@ def pb_only():
         choice = raw_input("Want one? (Y/N)")
         if choice[0].upper() == "Y":
             print "I mean, if you really insist..."
+            bread -= 2
+            peanut_butter -= 1
             still_hungry()
         elif choice[0].upper() == "N":
             print "Good choice. Peanut butter only sandwiches aren't as good as PB&J."
@@ -108,6 +110,8 @@ def pb_only():
         choice = raw_input("Want it? (Y/N)")
         if choice[0].upper() == "Y":
             print "Ugh, I suppose that's a lunch..."
+            bread -= 1
+            peanut_butter -= 1
             still_hungry()
         elif choice[0].upper() == "N":
             print "Good choice. Peanut butter only sandwiches just aren't as good as PB&J."
